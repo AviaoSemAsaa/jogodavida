@@ -1,5 +1,3 @@
-//JOGO DA VIDA
-
 #include <stdio.h>
 #include <stdlib.h>
 #ifdef _WIN32 
@@ -14,9 +12,7 @@
 #define VAZ '.'
 #define TAM 101
 
-//////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////
+
 void limpaMatriz(char **m, int nL, int nC)
 {
     int i,j;
@@ -51,7 +47,6 @@ void inicBloco(char **m, int nL, int nC)
       m[xInic+i][yInic+j]=padrao[i][j];
 }
 
-
 void inicSapo(char **m, int nL, int nC)
 {
 
@@ -67,7 +62,6 @@ void inicSapo(char **m, int nL, int nC)
 
 }
 
-
 void inicGlider(char **m, int nL, int nC)
 {
 char padrao[3][3]={{ORG,ORG,ORG},{ORG,VAZ,VAZ},{VAZ,ORG,VAZ}};
@@ -82,7 +76,6 @@ char padrao[3][3]={{ORG,ORG,ORG},{ORG,VAZ,VAZ},{VAZ,ORG,VAZ}};
     for(j=0;j<3;j++)
       m[xInic+i][yInic+j]=padrao[i][j];
 }
-
 
 void inicLWSS(char **m, int nL, int nC)
 {
@@ -100,6 +93,94 @@ char padrao[4][5]={{VAZ,ORG,VAZ,VAZ,ORG},{ORG,VAZ,VAZ,VAZ,VAZ},{ORG,VAZ,VAZ,VAZ,
 
 }
 
+char **alocaMatriz(nL, nC)
+{
+  char **mat ;
+  int i, j ;
+
+
+  mat = malloc (nL * sizeof (char*)) ;
+
+
+  for (i=0; i < nL; i++)
+    mat[i] = malloc (nC * sizeof (char));
+
+  return mat;
+}
+
+void desalocaMatriz(char **mAnt, int nL)
+{
+  int i;
+    for (i=0; i < nL; i++)
+     free (mAnt[i]);
+  free (mAnt);
+
+}
+
+void imprimeMatriz(char **mat, int nL, int nC)
+{
+  int i; int j;
+  
+  for(i=0;i<nL;i++)
+    	for(j=0;j<nC;j++)
+        printf("%c", mat[i][j]);
+}
+
+int contaVizinhos(int nL, int nC, int j, int i, char **mAnt)
+{
+  int vivos = 0;
+  int a, b, x, y;
+  char c;
+
+    for (y = -1; y <= 1; y++)
+    {
+      for (x = -1; x <= 1; x++)
+      {
+        c = mAnt[i+x][j+y];
+        if (c == ORG)
+          vivos++;
+      }
+    }
+  return vivos;
+}
+
+void copiaMatriz(char **mAnt, char **mAtual, int nL,int nC)
+{
+  int i; int j;
+  
+  for(i=0;i<nL;i++)
+    	for(j=0;j<nC;j++)
+        mAnt[i][j] = mAtual[i][j];
+} 
+
+void atualizaMat(char **mAtual, char **mAnt, int nL, int nC)
+{
+  int i, j, vivos;
+  char cel;
+  
+    for ( i = 0; i <= nL; i++)
+    {
+      for (j = 0; j <= nC; j++)
+      {
+        vivos = contaVizinhos(nC, nL, j, i, mAnt);
+        cel = mAnt[i][j];
+        if (cel == ORG)
+          vivos--;
+        if (vivos < 2)
+          mAtual[i][j] = VAZ;
+        else if ((vivos == 2 || vivos == 3) && cel == ORG)
+          mAtual[i][j] = ORG;
+        else if ((vivos > 3) && cel == ORG)
+          mAtual[i][j] = VAZ;
+        else if (vivos == 0 && cel == VAZ)
+          mAtual[i][j] = ORG;
+        else
+          mAtual[i][j] = mAnt [i][j];
+          
+      }
+    }
+}
+
 void menuInicJogo(char **mat, int nL, int nC)
 {
     int opcao;
@@ -115,65 +196,45 @@ void menuInicJogo(char **mat, int nL, int nC)
      case 5:   inicLWSS(mat,nL,nC); break;
    }
 
-    imprimeMatriz(mat,nL,nC);// TO DO
-
-    printf("Se inicializacao correta digite qualquer tecla para iniciar o jogo..."); while(getchar()!='\n'); getchar();
-
+  imprimeMatriz(mat,nL,nC);
 }
 
-
-
-//////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////// Parte a ser completada //////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////
 
 void jogaJogoVida(char **mAtual, int nL, int nC, int nCiclos)
 {
   char **mAnt;
-  int c;
+  int c, i;
 
-  //imprimindo na tela a matriz inicial
+  
   system("cls");
-  imprimeMatriz(mAtual,nL,nC); //TO DO
-  // getchar();
-  Sleep(100);
+  imprimeMatriz(mAtual,nL,nC); 
+  
+  for (i=0; i < 100; i++);
 
-  mAnt = alocaMatriz(nL,nC); //TO DO
+  mAnt = alocaMatriz(nL,nC);
 
   for(c=1;c<=nCiclos;c++)
   {
-        copiaMatriz(mAnt,mAtual,nL,nC); //TO DO implemente a fun��o que copia uma matriz na outra, equivalendo a mAnt = mAtual;
-
-        atualizaMat(mAtual,mAnt,nL,nC); //TO DO implemente nesta fun��o as regras que atualizam a matriz mAtual conforme o jogo da vida
-                                  //lembre de usar os dados de mAnt como a matriz do jogo no ciclo anterior para atualizar mAtual
+        copiaMatriz(mAnt,mAtual,nL,nC);
+        atualizaMat(mAtual,mAnt,nL,nC);
         system("cls");
-        imprimeMatriz(mAtual,nL,nC);// TO DO
+        imprimeMatriz(mAtual,nL,nC);
         // getchar();
-        Sleep(100);
+       for (i=0; i < 100; i++);
   }
-  desalocaMatriz(mAnt,nL); //TO DO
+  desalocaMatriz(mAnt,nL);
 
 }
 
-
-int main()
+int main ()
 {
+  char **mat;
+  int nL=20,nC=20,nCiclos=20;
+   mat = alocaMatriz(nL, nC);
 
-   char **mat;
+  printf("Escolha como quer começar: \n");
+  menuInicJogo(mat, nL, nC);
+  jogaJogoVida(mat, nL, nC, nCiclos);
 
-   int nL=20,nC=20,nCiclos=50; //ou fornecidos pelo usuario
-
-   mat = alocaMatriz(nL,nC); //TO DO
-
-   //TODO la�o INdeterminado que repete enquanto o usuario quiser continuar jogando:
-   //cada jogo equivale a nCiclos de um padr�o de inicializacao
-   //por exemplo o usuario pode escolher jogar nCiclos do padr�o Sapo
-   // quando terminar jogar mais nCiclos do padr�o Blinker
-   // depois encerrar o programa
-        menuInicJogo(mat,nL,nC);
-        jogaJogoVida(mat,nL,nC,nCiclos); //TO DO complete essa fun��o
-  //fim do laco indeterminado
-
-   desalocaMatriz(mat,nL);//TO DO
-
+  desalocaMatriz(mat,nL);
 }
