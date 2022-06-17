@@ -96,14 +96,12 @@ char padrao[4][5]={{VAZ,ORG,VAZ,VAZ,ORG},{ORG,VAZ,VAZ,VAZ,VAZ},{ORG,VAZ,VAZ,VAZ,
 char **alocaMatriz(nL, nC)
 {
   char **mat ;
-  int i, j ;
-
+  int i;
 
   mat = malloc (nL * sizeof (char*)) ;
 
-
   for (i=0; i < nL; i++)
-    mat[i] = malloc (nC * sizeof (char));
+     mat[i] = malloc (nC * sizeof (char)) ;
 
   return mat;
 }
@@ -120,29 +118,35 @@ void desalocaMatriz(char **mAnt, int nL)
 void imprimeMatriz(char **mat, int nL, int nC)
 {
   int i; int j;
-  
-  for(i=0;i<nL;i++)
-    	for(j=0;j<nC;j++)
-        printf("%c", mat[i][j]);
-}
 
-int contaVizinhos(int nL, int nC, int j, int i, char **mAnt)
+  for(i=0;i<nL;i++){
+        printf("\n");
+
+        for(j=0;j<nC;j++)
+            printf("%c", mat[i][j]);
+  }
+  printf("\n\n");
+}
+int contaVizinhos(int i, int j, int nC, int nL, char **mAnt)
 {
-  int vivos = 0;
-  int a, b, x, y;
-  char c;
+  int a, b, vivos=0;
 
-    for (y = -1; y <= 1; y++)
-    {
-      for (x = -1; x <= 1; x++)
+  if (i != 0 && j != 0 && i != (nL - 1) && j != (nC -1 ))
+  {
+  
+      for(a = i-1; a <= i+1; a++)
       {
-        c = mAnt[i+x][j+y];
-        if (c == ORG)
-          vivos++;
-      }
-    }
-  return vivos;
+        for(b = j-1; b <= j+1; b++)
+            {
+              if(mAnt[a][b]==ORG)
+                vivos++;
+            }
+      }   
+  }
+    return vivos;
+
 }
+ 
 
 void copiaMatriz(char **mAnt, char **mAtual, int nL,int nC)
 {
@@ -155,28 +159,34 @@ void copiaMatriz(char **mAnt, char **mAtual, int nL,int nC)
 
 void atualizaMat(char **mAtual, char **mAnt, int nL, int nC)
 {
+
+//1) Sobrevivência: Todo organismo com dois ou três organismos vizinhos sobreviverá para a próxima geração.
+//2) Morte: Cada organismo com quatro ou mais vizinhos morrerá (será removido) por superpopulação. Todo organismo com um vizinho ou nenhum morrerá por isolamento.
+//3) Nascimento: Cada célula vazia adjacente a exatamente três organismos vizinhos, não mais nem menos, é uma célula de nascimento. Um organismo será colocado nela no próximo movimento.
+
+  
   int i, j, vivos;
   char cel;
   
-    for ( i = 0; i <= nL; i++)
+    for ( i = 0; i < nL; i++)
     {
-      for (j = 0; j <= nC; j++)
+      for (j = 0; j < nC; j++)
       {
-        vivos = contaVizinhos(nC, nL, j, i, mAnt);
+        vivos = contaVizinhos(i, j, nC, nL, mAnt);
         cel = mAnt[i][j];
         if (cel == ORG)
           vivos--;
-        if (vivos < 2)
-          mAtual[i][j] = VAZ;
-        else if ((vivos == 2 || vivos == 3) && cel == ORG)
-          mAtual[i][j] = ORG;
-        else if ((vivos > 3) && cel == ORG)
-          mAtual[i][j] = VAZ;
-        else if (vivos == 0 && cel == VAZ)
-          mAtual[i][j] = ORG;
-        else
-          mAtual[i][j] = mAnt [i][j];
-          
+        if (cel == ORG  && vivos == 2)
+          cel = ORG;
+        else if(cel == ORG  && vivos == 3)
+          cel = ORG;
+        else if (cel == ORG && vivos > 3)
+          cel = VAZ;
+        else if (cel == ORG && vivos < 2)
+          cel = VAZ;
+        else if (cel == VAZ && vivos == 3)
+          cel = ORG;
+        mAtual[i][j] = cel;
       }
     }
 }
@@ -197,19 +207,26 @@ void menuInicJogo(char **mat, int nL, int nC)
    }
 
   imprimeMatriz(mat,nL,nC);
+
+  printf("Se inicializacao correta digite qualquer tecla para iniciar o jogo..."); while(getchar()!='\n'); getchar();
 }
 
 
 void jogaJogoVida(char **mAtual, int nL, int nC, int nCiclos)
 {
   char **mAnt;
-  int c, i;
+  int c, i, a, pollingDelay = 1000;
 
   
-  system("cls");
+  system("clear");
   imprimeMatriz(mAtual,nL,nC); 
   
-  for (i=0; i < 100; i++);
+  #ifdef _WIN32
+  Sleep(pollingDelay);
+  #else
+  usleep(pollingDelay*1000);  // sleep for 100 milliSeconds */
+  #endif
+
 
   mAnt = alocaMatriz(nL,nC);
 
@@ -217,10 +234,15 @@ void jogaJogoVida(char **mAtual, int nL, int nC, int nCiclos)
   {
         copiaMatriz(mAnt,mAtual,nL,nC);
         atualizaMat(mAtual,mAnt,nL,nC);
-        system("cls");
+        system("clear");
         imprimeMatriz(mAtual,nL,nC);
+        printf("\n");
         // getchar();
-       for (i=0; i < 100; i++);
+       #ifdef _WIN32
+  Sleep(pollingDelay);
+  #else
+  usleep(pollingDelay*1000);  // sleep for 100 milliSeconds */
+  #endif
   }
   desalocaMatriz(mAnt,nL);
 
@@ -235,6 +257,5 @@ int main ()
   printf("Escolha como quer começar: \n");
   menuInicJogo(mat, nL, nC);
   jogaJogoVida(mat, nL, nC, nCiclos);
-
   desalocaMatriz(mat,nL);
 }
