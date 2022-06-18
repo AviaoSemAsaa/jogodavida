@@ -119,20 +119,21 @@ void copiaMatriz(char **mAnt, char **mAtual, int nL,int nC)
     	for(j=0;j<nC;j++)
         mAnt[i][j] = mAtual[i][j];
 } 
-
 int contaVizinhos(int i, int j, int nC, int nL, char **mAnt)
 {
   int a, b, vivos=0;
 
-  if (i != 0 && j != 0 && i != (nL - 1) && j != (nC -1 ))
   {
-  
       for(a = i-1; a <= i+1; a++)
       {
         for(b = j-1; b <= j+1; b++)
             {
-              if(mAnt[a][b]==ORG)
-                vivos++;
+                if (a >= 0 && b >= 0 && a <= (nL-1) && b <= (nC -1))
+                {
+                    if(mAnt[a][b]==ORG)
+                    vivos++;
+                }
+              }  
             }
       }   
   }
