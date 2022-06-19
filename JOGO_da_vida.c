@@ -12,6 +12,94 @@
 #define VAZ '.'
 #define TAM 101
 
+void leArquivo(char **mat, int nC, int nL);
+
+char **alocaMatriz(int nL,int nC);
+void desalocaMatriz(char **mAnt, int nL);
+void limpaMatriz(char **m, int nL, int nC);
+void imprimeMatriz(char **mat, int nL, int nC);
+
+
+int contaVizinhos(int nL, int nC, int j, int i, char **mAnt);
+void atualizaMat(char **mAtual, char **mAnt, int nL, int nC);
+
+
+void inicBlinker(char **m, int nL, int nC);
+void inicBloco(char **m, int nL, int nC);
+void inicSapo(char **m, int nL, int nC);
+void inicGlider(char **m, int nL, int nC);
+void inicLWSS(char **m, int nL, int nC);
+
+
+void menuInicJogo(char **mat, int nL, int nC);
+void jogaJogoVida(char **mAtual, int nL, int nC, int nCiclos);
+
+
+
+int main ()
+{
+  char **mat;
+  int nL=10, nC=10, nCiclos=10, escolha=0, parar = 0;
+   mat = alocaMatriz(nL, nC);
+
+	
+	while (parar != 1){
+      printf("Escolha como quer começar, pelo menu (1) ou enviando uma matriz por arquivo (2): ");
+      scanf("%d", &escolha);
+
+      printf("\nInsira o tamanho da matriz \n");
+	    scanf("%d", &nL);
+	    nC = nL;
+
+	    printf("Insira o nº de Ciclos: \n");
+	    scanf("%d", &nCiclos);	
+		
+      if (escolha == 1)
+        menuInicJogo(mat, nL, nC);
+
+      else if (escolha == 2)
+        leArquivo(mat, nC, nL);
+
+      else 
+      {
+        printf ("Escolha de começo invalida ");
+        break;
+      }
+        
+      jogaJogoVida(mat, nL, nC, nCiclos);
+      desalocaMatriz(mat,nL);
+	
+	    printf("\nDeseja continuar? Insira 1 para parar: \n");
+      scanf("%d", &parar);  
+	}
+}
+
+
+
+
+
+char **alocaMatriz(int nL, int nC)
+{
+  char **mat ;
+  int i;
+
+  mat = malloc (nL * sizeof (char*)) ;
+
+  for (i=0; i < nL; i++)
+     mat[i] = malloc (nC * sizeof (char)) ;
+
+  return mat;
+}
+
+void desalocaMatriz(char **mAnt, int nL)
+{
+  int i;
+    for (i=0; i < nL; i++)
+     free (mAnt[i]);
+  free (mAnt);
+
+}
+
 
 void limpaMatriz(char **m, int nL, int nC)
 {
@@ -20,6 +108,80 @@ void limpaMatriz(char **m, int nL, int nC)
      for(j=0;j<nC;j++)
         m[i][j]=VAZ;
 }
+
+void imprimeMatriz(char **mat, int nL, int nC)
+{
+  int i; int j;
+
+  for(i=0;i<nL;i++){
+        printf("\n");
+
+        for(j=0;j<nC;j++)
+            printf("%c", mat[i][j]);
+  }
+  printf("\n\n");
+}
+
+void copiaMatriz(char **mAnt, char **mAtual, int nL,int nC)
+{
+  int i; int j;
+  
+  for(i=0;i<nL;i++)
+    	for(j=0;j<nC;j++)
+        mAnt[i][j] = mAtual[i][j];
+} 
+int contaVizinhos(int i, int j, int nC, int nL, char **mAnt)
+{
+  int a, b, vivos=0;
+
+  {
+    for(a = i-1; a <= i+1; a++)
+    {
+      for(b = j-1; b <= j+1; b++)
+      {
+        if (a >= 0 && b >= 0 && a <= (nL-1) && b <= (nC -1))
+        {
+          if(mAnt[a][b]==ORG)
+          vivos++;
+        }                
+      }
+    }   
+  }
+    return vivos;
+
+}
+
+void atualizaMat(char **mAtual, char **mAnt, int nL, int nC)
+{
+  
+  int i, j, vivos;
+  char cel;
+  
+    for ( i = 0; i < nL; i++)
+    {
+      for (j = 0; j < nC; j++)
+      {
+        vivos = contaVizinhos(i, j, nC, nL, mAnt);
+        cel = mAnt[i][j];
+        if (cel == ORG)
+          vivos--;
+        if (cel == ORG  && vivos == 2)
+          cel = ORG;
+        else if(cel == ORG  && vivos == 3)
+          cel = ORG;
+        else if (cel == ORG && vivos > 3)
+          cel = VAZ;
+        else if (cel == ORG && vivos < 2)
+          cel = VAZ;
+        else if (cel == VAZ && vivos == 3)
+          cel = ORG;
+        mAtual[i][j] = cel;
+      }
+    }
+}
+
+
+
 
 void inicBlinker(char **m, int nL, int nC)
 {
@@ -46,6 +208,7 @@ void inicBloco(char **m, int nL, int nC)
     for(j=0;j<2;j++)
       m[xInic+i][yInic+j]=padrao[i][j];
 }
+
 
 void inicSapo(char **m, int nL, int nC)
 {
@@ -79,6 +242,7 @@ char padrao[3][3]={{ORG,ORG,ORG},{ORG,VAZ,VAZ},{VAZ,ORG,VAZ}};
 
 void inicLWSS(char **m, int nL, int nC)
 {
+	
 char padrao[4][5]={{VAZ,ORG,VAZ,VAZ,ORG},{ORG,VAZ,VAZ,VAZ,VAZ},{ORG,VAZ,VAZ,VAZ,ORG},{ORG,ORG,ORG,ORG,VAZ}};
  int i,j,xInic,yInic;
 
@@ -93,103 +257,7 @@ char padrao[4][5]={{VAZ,ORG,VAZ,VAZ,ORG},{ORG,VAZ,VAZ,VAZ,VAZ},{ORG,VAZ,VAZ,VAZ,
 
 }
 
-char **alocaMatriz(nL, nC)
-{
-  char **mat ;
-  int i;
 
-  mat = malloc (nL * sizeof (char*)) ;
-
-  for (i=0; i < nL; i++)
-     mat[i] = malloc (nC * sizeof (char)) ;
-
-  return mat;
-}
-
-void desalocaMatriz(char **mAnt, int nL)
-{
-  int i;
-    for (i=0; i < nL; i++)
-     free (mAnt[i]);
-  free (mAnt);
-
-}
-
-void imprimeMatriz(char **mat, int nL, int nC)
-{
-  int i; int j;
-
-  for(i=0;i<nL;i++){
-        printf("\n");
-
-        for(j=0;j<nC;j++)
-            printf("%c", mat[i][j]);
-  }
-  printf("\n\n");
-}
-int contaVizinhos(int i, int j, int nC, int nL, char **mAnt)
-{
-  int a, b, vivos=0;
-
-  if (i != 0 && j != 0 && i != (nL - 1) && j != (nC -1 ))
-  {
-  
-      for(a = i-1; a <= i+1; a++)
-      {
-        for(b = j-1; b <= j+1; b++)
-            {
-              if(mAnt[a][b]==ORG)
-                vivos++;
-            }
-      }   
-  }
-    return vivos;
-
-}
- 
-
-void copiaMatriz(char **mAnt, char **mAtual, int nL,int nC)
-{
-  int i; int j;
-  
-  for(i=0;i<nL;i++)
-    	for(j=0;j<nC;j++)
-        mAnt[i][j] = mAtual[i][j];
-} 
-
-void atualizaMat(char **mAtual, char **mAnt, int nL, int nC)
-{
-
-//1) Sobrevivência: Todo organismo com dois ou três organismos vizinhos sobreviverá para a próxima geração.
-//2) Morte: Cada organismo com quatro ou mais vizinhos morrerá (será removido) por superpopulação. Todo organismo com um vizinho ou nenhum morrerá por isolamento.
-//3) Nascimento: Cada célula vazia adjacente a exatamente três organismos vizinhos, não mais nem menos, é uma célula de nascimento. Um organismo será colocado nela no próximo movimento.
-
-  
-  int i, j, vivos;
-  char cel;
-  
-    for ( i = 0; i < nL; i++)
-    {
-      for (j = 0; j < nC; j++)
-      {
-        vivos = contaVizinhos(i, j, nC, nL, mAnt);
-        cel = mAnt[i][j];
-        if (cel == ORG)
-          vivos--;
-        if (cel == ORG  && vivos == 2)
-          cel = ORG;
-        else if(cel == ORG  && vivos == 3)
-          cel = ORG;
-        else if (cel == ORG && vivos > 3)
-          cel = VAZ;
-        else if (cel == ORG && vivos < 2)
-          cel = VAZ;
-        else if (cel == VAZ && vivos == 3)
-          cel = ORG;
-        mAtual[i][j] = cel;
-      }
-    }
-}
 
 void menuInicJogo(char **mat, int nL, int nC)
 {
@@ -210,6 +278,7 @@ void menuInicJogo(char **mat, int nL, int nC)
 
   printf("Se inicializacao correta digite qualquer tecla para iniciar o jogo..."); while(getchar()!='\n'); getchar();
 }
+
 
 
 void jogaJogoVida(char **mAtual, int nL, int nC, int nCiclos)
@@ -238,24 +307,49 @@ void jogaJogoVida(char **mAtual, int nL, int nC, int nCiclos)
         imprimeMatriz(mAtual,nL,nC);
         printf("\n");
         // getchar();
-       #ifdef _WIN32
-  Sleep(pollingDelay);
-  #else
-  usleep(pollingDelay*1000);  // sleep for 100 milliSeconds */
-  #endif
+       	#ifdef _WIN32
+  			Sleep(pollingDelay);
+  			#else
+  			usleep(pollingDelay*1000);  // equivalente ao sleep
+        #endif
   }
   desalocaMatriz(mAnt,nL);
 
 }
-
-int main ()
+void leArquivo(char **mat, int nC, int nL)
 {
-  char **mat;
-  int nL=20,nC=20,nCiclos=20;
-   mat = alocaMatriz(nL, nC);
+  int i, j, b;
+  char a;
+  FILE *arquivo;
 
-  printf("Escolha como quer começar: \n");
-  menuInicJogo(mat, nL, nC);
-  jogaJogoVida(mat, nL, nC, nCiclos);
-  desalocaMatriz(mat,nL);
+  arquivo = fopen("C:\\Users\\Maicon\\Documents\\arquivo jogo da vida\\matriz.txt", "r");
+
+  //controle pra caso o arquivo nao abra, mas por algum motivo so           imprime os \n e nao a mensagem//
+  if (arquivo == NULL)
+  {
+    printf ("\n\n\n\n\n\n\n\n\n\nArquivo nao pode ser aberto");
+  }
+
+
+  //nao sei se essa gambiarra funciona pq n consigo nem abrir o arquivo//
+  limpaMatriz(mat,  nL,  nC);
+
+  for (i = 0; i < nL; i++)
+  {
+    for (j = 0; j < nC; j++)
+    {
+      fscanf(arquivo, "%d%c", &b, &a);
+      mat[i][b] = ORG;
+      if (a != ',' )
+      {
+        break;
+      }
+    }
+    fscanf(arquivo, "\n");
+  }   
+    fclose(arquivo);
+  
+    imprimeMatriz(mat, nL, nC);
+  
+    printf("Se inicializacao correta digite qualquer tecla para iniciar o jogo..."); while(getchar()!='\n'); getchar();
 }
