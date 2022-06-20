@@ -20,8 +20,7 @@ typedef struct tab
   char nomeJogo[TAM];
   int ciclosVida;
   int dim1, dim2;
-  char **m;			//AtenC'C#o! Essa matriz terC! que ser alocada dinamicamente
-//para que a funcao que inicializa possa funcionar
+  char **m;			
 } Tab;
 
 char **alocaMatriz (Tab *j);
@@ -47,8 +46,7 @@ void jogaJogoVida (Tab * j);
 
 
 
-int
-main ()
+int main ()
 {
 
   ;
@@ -83,8 +81,7 @@ main ()
 
 
 
-char **
-alocaMatriz (Tab *j)
+char **alocaMatriz (Tab *j)
 {
   char **mat;
   int i;
@@ -97,8 +94,7 @@ alocaMatriz (Tab *j)
   return mat;
 }
 
-void
-desalocaMatriz (Tab *j)
+void desalocaMatriz (Tab *j)
 {
   int i;
   for (i = 0; i < j->dim1; i++)
@@ -107,8 +103,7 @@ desalocaMatriz (Tab *j)
 
 }
 
-void 
-desalocaMatrizSimples (Tab *j, char **m)
+void desalocaMatrizSimples (Tab *j, char **m)
 {
   int i;
   for (i = 0; i < j->dim1; i++)
@@ -118,8 +113,7 @@ desalocaMatrizSimples (Tab *j, char **m)
 }
 
 
-void
-limpaMatriz (Tab * j)
+void limpaMatriz (Tab * j)
 {
   int i, k;
   for (i = 0; i < j->dim1; i++)
@@ -127,8 +121,7 @@ limpaMatriz (Tab * j)
       j->m[i][k] = VAZ;
 }
 
-void
-imprimeMatriz (Tab * j)
+void imprimeMatriz (Tab * j)
 {
   int i;
   int k;
@@ -143,8 +136,7 @@ imprimeMatriz (Tab * j)
   printf ("\n\n");
 }
 
-void
-copiaMatriz (Tab *j, char **m)
+void copiaMatriz (Tab *j, char **m)
 {
   int i;
   int k;
@@ -154,8 +146,7 @@ copiaMatriz (Tab *j, char **m)
       m[i][k] = j->m[i][k];
 }
 
-int
-contaVizinhos (Tab *j, int i, int k, char **mAnt)
+int contaVizinhos (Tab *j, int i, int k, char **mAnt)
 {
   int a, b, vivos = 0;
 
@@ -208,8 +199,7 @@ void atualizaMat (Tab *j, char **mAnt)
 
 
 
-void
-inicBlinker (Tab *j)
+void inicBlinker (Tab *j)
 {
   char padrao[1][3] = { {ORG, ORG, ORG} };
   int i, k, xInic = j->dim1 / 2, yInic = j->dim2 / 2;
@@ -221,8 +211,7 @@ inicBlinker (Tab *j)
       j->m[xInic + i][yInic + k] = padrao[i][k];
 }
 
-void
-inicBloco (Tab *j)
+void inicBloco (Tab *j)
 {
   char padrao[2][2] = { {ORG, ORG}, {ORG, ORG} };
   int i, k, xInic = j->dim1 / 2, yInic = j->dim2 / 2;
@@ -237,8 +226,7 @@ inicBloco (Tab *j)
 }
 
 
-void
-inicSapo (Tab *j)
+void inicSapo (Tab *j)
 {
 
   char padrao[2][4] = { {VAZ, ORG, ORG, ORG}, {ORG, ORG, ORG, VAZ} };
@@ -253,8 +241,7 @@ inicSapo (Tab *j)
 
 }
 
-void
-inicGlider (Tab *j)
+void inicGlider (Tab *j)
 {
   char padrao[3][3] = { {ORG, ORG, ORG}, {ORG, VAZ, VAZ}, {VAZ, ORG, VAZ} };
   int i, k, xInic, yInic;
@@ -269,8 +256,7 @@ inicGlider (Tab *j)
       j->m[xInic + i][yInic + k] = padrao[i][k];
 }
 
-void
-inicLWSS (Tab *j)
+void inicLWSS (Tab *j)
 {
 
   char padrao[4][5] =
@@ -296,8 +282,7 @@ inicLWSS (Tab *j)
 
 
 
-void
-menuInicJogo (Tab * j)
+void menuInicJogo (Tab * j)
 {
   int opcao;
 
@@ -341,8 +326,7 @@ menuInicJogo (Tab * j)
 
 
 
-void
-jogaJogoVida (Tab *j)
+void jogaJogoVida (Tab *j)
 {
   char **mAnt;
   int c, i, a, pollingDelay = 1000;
